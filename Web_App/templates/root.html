@@ -1,108 +1,16 @@
 <!DOCTYPE html>
-<style>
 
-  @font-face {
-    font-family: 'Dongle';
-    src: url(static/Dongle-Light.ttf);
-  }
-
-      body {
-        text-align: center;
-        font-family: 'Dongle';
-        font-size: 40px;
-        background-color: White;
-        color: black;
-        padding: 0;
-        margin: 0;
-      }
-
-      header {
-        text-align: left;
-        background-color: #3c896d;
-        width: 100%;
-        margin-top: -40px;
-      }
-
-      nav a {
-        display: inline-block;
-        padding-left: 20px;
-      }
-
-  
-.button {
-        font-family: "Dongle";
-    }
-</style>
 
 
 
 <html>
 <header>
   <title>HydroTronics Home Page</title>
-    <div class="container">
-      <nav>
-        <ul>
-          <a href="https://hydrotronics.uc.r.appspot.com/">
-            <img src="static/green_and_white_logo.JPG"style="width: 256px;" >
-          </a>
-          <a href="/">Home</a>
-          <a href="https://engineering.purdue.edu/477grp17/Files/docs/User%20Manual.pdf">User Manual</a>
-        </ul>
-      </nav>
-    </div>
+
 </header>
 
 <body>
 
-    <a>
-      Welcome to Your HydroTronics Homepage <br>
-    </a> <br>
-
-    <form title="ID_select" class="button" method="POST" action="/" enctype="multipart/form-data">
-        <label for="deviceID">Please Enter Device ID to View Data: </label>
-        <input title="ID_select" oninput="this.value=this.value.slice(0,this.maxLength)" type="number" name="deviceID", maxlength="11">
-        <input title="ID_select" type="submit">
-    </form> <p style="color:red">{{ message }}</p>
-    
-
-    {% if pH == null or pH == '' %}
-    {% else %}
-      <c>
-          Current Stats for Device {{ device_id }} <br>
-      </c>
-
-      <d>
-              pH: {{ pH }}<br>
-              Dissolved Oxygen: {{ dissolved_oxygen }} mg/L<br>
-              Water Level: {{ water_level }}<br>
-              Brightness Level: {{ LED_level }}<br>
-              LED Timer: {{ LED_timer }}<br>
-              Last Updated: {{ last_update }}<br>
-
-              <form title="set_led_brightness" class="button" action="/" method="POST">
-                <label for="set_led_brightness">Change Brightness: </label>
-                <input type="hidden" name="deviceID" value={{ device_id }} />
-                <select name="set_led_brightness" id="set_led_brightness" onchange="this.form.submit()">
-                  <option value="0"></option>  
-                  <option value="0">Off</option>
-                    <option value="1">20%</option>
-                    <option value="2">50%</option>
-                    <option value="3">100%</option>
-                </select>
-              </form> <p style="color:green">{{ bright_message }}</p>
-
-              <form title="set_led_timer" class="button" action="/" method="POST">
-                <label for="set_led_timer">Change LED Timer: </label>
-                <input type="hidden" name="deviceID" value={{ device_id }} />
-                <select name="set_led_timer" id="set_led_timer" onchange="this.form.submit()">
-                  <option value="0"></option>  
-                  <option value="0">Off</option>
-                    <option value="1">12 Hours</option>
-                    <option value="2">16 Hours</option>
-                </select>
-              </form> <p style="color:green">{{ led_timer_message }}</p>
-    {% endif %}
-    </d>
 
 
 </body>
