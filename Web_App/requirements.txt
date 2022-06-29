@@ -1,0 +1,8 @@
+Flask
+flask-restful
+google-cloud-datastore
+google-auth
+werkzeug
+google-cloud-secret-manager
+requests
+pytz
