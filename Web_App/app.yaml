@@ -17,9 +17,10 @@ runtime: python38
 instance_class: F1  #F1 F2 F4 F4 F4_1G
 env_variables:
     FLASK_ENV: production
+    GCP_PURDUEIO_PROJECT_ID: purdueio-notify
+    PURDUEIO_EMAIL_SECRET_ID: purdueio-email
+    PURDUEIO_PASSWORD_SECRET_ID: purdueio-apppassword
 
-# beta_settings:
-#     cloud_sql_instances: ece-461-project-2-team-4:us-central1:score-storage=tcp:5432
 
 #handlers:
   # This configures Google App Engine to serve the files in the app's static
