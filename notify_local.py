@@ -38,7 +38,6 @@ email_payload = secret_email_response.payload.data.decode("UTF-8")
 pass_payload = secret_pass_response.payload.data.decode("UTF-8")
 
 
-
 def newCRN(term, CRN_num):
     print(f"Adding CRN {CRN_num} to search.")
     path = term + '/CRN/' + CRN_num
