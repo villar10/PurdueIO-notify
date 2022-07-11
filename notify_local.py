@@ -29,7 +29,6 @@ db = firestore.client()
 secret_client = secretmanager.SecretManagerServiceClient()
 secret_email = f"projects/{project_id}/secrets/{email_id}/versions/latest"
 secret_pass = f"projects/{project_id}/secrets/{password_id}/versions/latest"
-print(secret_email)
 # Access the secret version.
 secret_email_response = secret_client.access_secret_version(request={"name": secret_email})
 secret_pass_response = secret_client.access_secret_version(request={"name": secret_pass})
