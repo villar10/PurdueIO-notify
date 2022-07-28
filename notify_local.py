@@ -140,7 +140,6 @@ def updateCRN(term, CRN_num, email) -> bool:
             ssl_context = ssl.create_default_context()
             email_server = smtplib.SMTP_SSL(smtp_server_domain_name, smtp_port, context=ssl_context)
             email_server.login(email_payload, pass_payload)          #TODO: Change this to gather from Google Secrets Manager
-            #result = email_server.sendmail('purdueionotify@gmail.com', 'ryanvillarreal116@gmail.com', f"Subject: {subject}\n{content}")
             result = email_server.sendmail(email_payload, email, f"Subject: PurdueIO Notify: Change Detected for CRN {CRN_num}\nStatus of CRN {CRN_num} has changed from {prev_stat_string} to {new_stat_string}.\nCurrent Enrollment: {curr_enrolled}\nCapacity: {capacity}\nSeats Remaining: {remaining}\n\nThis message was sent automatically. For support, reply to this message or email purdueIOnotify@gmail.com")
             email_server.quit()
 
