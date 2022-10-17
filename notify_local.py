@@ -72,7 +72,7 @@ def initialPopulate(term, CRN_num):
     else:
         print(f"Error! CRN {CRN_num} in term {term} was not properly created in Firestore.")
         return
-    term_code = "202310"    #TODO: This is setup as a constant but will need to change for future semesters
+    term_code = "202320"    #TODO: This is setup as a constant but will need to change for future semesters
     getDataURL = f"http://api.purdue.io/odata/Sections?$filter=CRN eq '{CRN_num}' and Class/Term/Code eq '{term_code}'"
     req = requests.get(getDataURL)
     full_response = req.json()
@@ -112,7 +112,7 @@ def updateCRN(term, CRN_num, email) -> bool:
     else:
         print(f"Error! CRN {CRN_num} in term {term} was not properly created in Firestore.")
         return
-    term_code = "202310"    #TODO: This is setup as a constant but will need to change for future semesters
+    term_code = "202320"    #TODO: This is setup as a constant but will need to change for future semesters
     getDataURL = f"http://api.purdue.io/odata/Sections?$filter=CRN eq '{CRN_num}' and Class/Term/Code eq '{term_code}'"
     req = requests.get(getDataURL)
     if req.status_code == 200:
