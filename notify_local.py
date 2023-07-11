@@ -9,6 +9,8 @@ import traceback
 import smtplib
 import ssl
 from google.cloud import secretmanager
+from datetime import datetime
+import pytz
 
 
 project_id = os.environ.get('GCP_PURDUEIO_PROJECT_ID')
@@ -36,6 +38,8 @@ secret_pass_response = secret_client.access_secret_version(request={"name": secr
 email_payload = secret_email_response.payload.data.decode("UTF-8")
 pass_payload = secret_pass_response.payload.data.decode("UTF-8")
 
+
+tz_IN = pytz.timezone('America/Indianapolis') 
 
 def newCRN(term, CRN_num):
     print(f"Adding CRN {CRN_num} to search.")
@@ -133,14 +137,15 @@ def updateCRN(term, CRN_num, email) -> bool:
             #send email here
             prev_stat_string = "Closed" if prev_full_flag else "Open"
             new_stat_string = "Closed" if new_full_flag else "Open"
-            print(f"Sending email to {email}. Status of CRN {CRN_num} has changed from {prev_stat_string} to {new_stat_string}.")
+            curr_time = datetime.now(tz_IN).strftime("%H:%M:%S")
+            print(f"Sending email to {email}. Status of CRN {CRN_num} has changed from {prev_stat_string} to {new_stat_string} at {curr_time} Purdue time.")
             #Setup Email
             smtp_server_domain_name = 'smtp.gmail.com'
             smtp_port = 465
             ssl_context = ssl.create_default_context()
             email_server = smtplib.SMTP_SSL(smtp_server_domain_name, smtp_port, context=ssl_context)
             email_server.login(email_payload, pass_payload)          #TODO: Change this to gather from Google Secrets Manager
-            result = email_server.sendmail(email_payload, email, f"Subject: PurdueIO Notify: Change Detected for CRN {CRN_num}\nStatus of CRN {CRN_num} has changed from {prev_stat_string} to {new_stat_string}.\nCurrent Enrollment: {curr_enrolled}\nCapacity: {capacity}\nSeats Remaining: {remaining}\n\nThis message was sent automatically. For support, reply to this message or email purdueIOnotify@gmail.com")
+            result = email_server.sendmail(email_payload, email, f"Subject: PurdueIO Notify: Change Detected for CRN {CRN_num}\nStatus of CRN {CRN_num} has changed from {prev_stat_string} to {new_stat_string} at {curr_time} Purdue time.\nCurrent Enrollment: {curr_enrolled}\nCapacity: {capacity}\nSeats Remaining: {remaining}\n\nThis message was sent automatically. For support, reply to this message or email purdueIOnotify@gmail.com")
             email_server.quit()
 
 
@@ -156,7 +161,8 @@ def updateCRN(term, CRN_num, email) -> bool:
     
 
 def updateAllData(term, email):
-    print(f"\nChecking for changes in CRNs {CRN_inputs}.")
+    curr_time = datetime.now(tz_IN).strftime("%H:%M:%S")
+    print(f"\nChecking for changes in CRNs {CRN_inputs} at {curr_time} Purdue time.")
     change_detected = False
     for CRN in CRN_inputs:
         curr_change_detected = updateCRN(term, CRN, email)
