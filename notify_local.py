@@ -45,13 +45,13 @@ def newCRN(term, CRN_num):
     term_db.set(CRN_data)
 
 def deleteCRN(CRN_num):
-    term = db.collection(u'term').document(u'2022fall').collections()
+    term = db.collection(u'term').document(u'2023fall').collections()
     for CRNs in term:
         selected = CRNs.document(CRN_num)
         selected.delete()
 
 def wipeCRNs():
-    term = db.collection(u'term').document(u'2022fall').collections()
+    term = db.collection(u'term').document(u'2023fall').collections()
     for CRNs in term:
         for CRN in CRNs.stream():
             #print(type(CRN))
@@ -72,7 +72,7 @@ def initialPopulate(term, CRN_num):
     else:
         print(f"Error! CRN {CRN_num} in term {term} was not properly created in Firestore.")
         return
-    term_code = "202320"    #TODO: This is setup as a constant but will need to change for future semesters
+    term_code = "202410"    #TODO: This is setup as a constant but will need to change for future semesters
     getDataURL = f"http://api.purdue.io/odata/Sections?$filter=CRN eq '{CRN_num}' and Class/Term/Code eq '{term_code}'"
     req = requests.get(getDataURL)
     full_response = req.json()
@@ -112,7 +112,7 @@ def updateCRN(term, CRN_num, email) -> bool:
     else:
         print(f"Error! CRN {CRN_num} in term {term} was not properly created in Firestore.")
         return
-    term_code = "202320"    #TODO: This is setup as a constant but will need to change for future semesters
+    term_code = "202410"    #TODO: This is setup as a constant but will need to change for future semesters
     getDataURL = f"http://api.purdue.io/odata/Sections?$filter=CRN eq '{CRN_num}' and Class/Term/Code eq '{term_code}'"
     req = requests.get(getDataURL)
     if req.status_code == 200:
@@ -191,7 +191,7 @@ def main():
     #CRN_inputs = []
     try:
         #term_selected = input("Enter term you would like to track (eg. 2022fall): ")
-        term_selected = '2022fall'
+        term_selected = '2023fall'
         email_confirmed = False
         while not email_confirmed:
             email = input("Enter email you would like to receive updates at: ")
