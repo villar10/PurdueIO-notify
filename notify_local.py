@@ -239,7 +239,7 @@ def main():
 
     print("Beginning search routine. CRNs will be checked every minute for significant changes.")
     #Now begin one minute loop and update all CRNs that are being tracked.
-    taskLoop(60, updateAllData, term_selected, email)
+    taskLoop(300, updateAllData, term_selected, email)
 
         
 
