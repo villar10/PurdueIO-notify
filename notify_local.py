@@ -11,6 +11,7 @@ import ssl
 from google.cloud import secretmanager
 from datetime import datetime
 import pytz
+import re
 
 
 project_id = os.environ.get('GCP_PURDUEIO_PROJECT_ID')
@@ -137,7 +138,7 @@ def updateCRN(term, CRN_num, email) -> bool:
             #send email here
             prev_stat_string = "Closed" if prev_full_flag else "Open"
             new_stat_string = "Closed" if new_full_flag else "Open"
-            curr_time = datetime.now(tz_IN).strftime("%H:%M:%S")
+            curr_time = datetime.now(tz_IN).ctime()
             print(f"Sending email to {email}. Status of CRN {CRN_num} has changed from {prev_stat_string} to {new_stat_string} at {curr_time} Purdue time.")
             #Setup Email
             smtp_server_domain_name = 'smtp.gmail.com'
@@ -161,7 +162,7 @@ def updateCRN(term, CRN_num, email) -> bool:
     
 
 def updateAllData(term, email):
-    curr_time = datetime.now(tz_IN).strftime("%H:%M:%S")
+    curr_time = datetime.now(tz_IN).ctime()
     print(f"\nChecking for changes in CRNs {CRN_inputs} at {curr_time} Purdue time.")
     change_detected = False
     for CRN in CRN_inputs:
@@ -189,7 +190,10 @@ def taskLoop(occurence, task, term, email): #Adapted from https://stackoverflow.
         next_time += (time.time() - next_time) // occurence * occurence + occurence
 
 
-
+def email_validation(email_to_check) -> bool:
+    if re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email_to_check):
+        return True
+    return False
 
 def main():
     wipeCRNs()      #This will completely mess things up if multiple users are running the program at once
@@ -200,7 +204,12 @@ def main():
         term_selected = '2023fall'
         email_confirmed = False
         while not email_confirmed:
-            email = input("Enter email you would like to receive updates at: ")
+            valid_email = False
+            while not valid_email:
+                email = input("Enter email you would like to receive updates at: ")
+                valid_email = email_validation(email)
+                if not valid_email:
+                    print("Email invalid. Please enter again.")
             email_selection = input(f"Is this the correct email? [Y/n]\n{email}\n")
             if email_selection == "Y" or email_selection == "y" or email_selection == "yes" or email_selection == "Yes":
                 email_confirmed = True
