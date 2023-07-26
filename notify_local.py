@@ -88,8 +88,24 @@ def initialPopulate(term, CRN_num):
         #CRN_inputs.remove(CRN_num)
         pop = True
         return pop
-    #print(full_response['value'])
-    #print(type(full_response['value']))
+
+    #Get full course title through multiple requests
+    classID = response_data['ClassId']
+    class_URL = f'https://api.purdue.io/odata/Classes?$filter=ID eq {classID}'
+    class_response = requests.get(class_URL).json()
+    courseID = class_response['value'][0]['CourseId']
+    course_URL = f'https://api.purdue.io/odata/Courses?$filter=ID eq {courseID}'
+    course_response = requests.get(course_URL).json()
+    course_num = course_response['value'][0]['Number']
+    subjectID = course_response['value'][0]['SubjectId']
+    subject_URL = f'https://api.purdue.io/odata/Subjects?$filter=ID eq {subjectID}'
+    subject_response = requests.get(subject_URL).json()
+    subject_name = subject_response['value'][0]['Abbreviation']
+    
+    full_course_name = f'{subject_name} {course_num}'
+
+
+
     capacity = response_data['Capacity']
     curr_enrolled = response_data['Enrolled']
     remaining = response_data['RemainingSpace']
@@ -101,9 +117,13 @@ def initialPopulate(term, CRN_num):
     CRN_data['Enrolled'] = curr_enrolled
     CRN_data['CRN'] = CRN_num
     CRN_data['Full'] = full
+    CRN_data['CourseName'] = full_course_name
     
     #print(CRN_data)
     CRN_doc_ref.set(CRN_data)
+    if not pop:
+        print(f"Course {full_course_name} with CRN {CRN_num} was added successfully. This section {'is currently full.' if full else f'has {remaining} seats left.'}")
+        print('------------------------------------')
     return pop
 
 def updateCRN(term, CRN_num, email) -> bool:
@@ -130,6 +150,7 @@ def updateCRN(term, CRN_num, email) -> bool:
     capacity = response_data['Capacity']
     curr_enrolled = response_data['Enrolled']
     prev_full_flag = CRN_data['Full']
+    full_course_name = CRN_data['CourseName']
     remaining = response_data['RemainingSpace']
     if not ((capacity == CRN_data['Capacity']) and (curr_enrolled == CRN_data['Enrolled']) and (remaining == CRN_data['Remaining'])):
         new_full_flag = True if remaining <= 0 else False
@@ -139,14 +160,14 @@ def updateCRN(term, CRN_num, email) -> bool:
             prev_stat_string = "Closed" if prev_full_flag else "Open"
             new_stat_string = "Closed" if new_full_flag else "Open"
             curr_time = datetime.now(tz_IN).ctime()
-            print(f"Sending email to {email}. Status of CRN {CRN_num} has changed from {prev_stat_string} to {new_stat_string} at {curr_time} Purdue time.")
+            print(f"Sending email to {email}. Status of course {full_course_name} with CRN {CRN_num} has changed from {prev_stat_string} to {new_stat_string} at {curr_time} Purdue time.")
             #Setup Email
             smtp_server_domain_name = 'smtp.gmail.com'
             smtp_port = 465
             ssl_context = ssl.create_default_context()
             email_server = smtplib.SMTP_SSL(smtp_server_domain_name, smtp_port, context=ssl_context)
             email_server.login(email_payload, pass_payload)          #TODO: Change this to gather from Google Secrets Manager
-            result = email_server.sendmail(email_payload, email, f"Subject: PurdueIO Notify: Change Detected for CRN {CRN_num}\nStatus of CRN {CRN_num} has changed from {prev_stat_string} to {new_stat_string} at {curr_time} Purdue time.\nCurrent Enrollment: {curr_enrolled}\nCapacity: {capacity}\nSeats Remaining: {remaining}\n\nThis message was sent automatically. For support, reply to this message or email purdueIOnotify@gmail.com")
+            result = email_server.sendmail(email_payload, email, f"Subject: PurdueIO Notify: Change Detected for {full_course_name} with CRN {CRN_num}\nStatus of {full_course_name} with CRN {CRN_num} has changed from {prev_stat_string} to {new_stat_string} at {curr_time} Purdue time.\nCurrent Enrollment: {curr_enrolled}\nCapacity: {capacity}\nSeats Remaining: {remaining}\n\nThis message was sent automatically. For support, reply to this message or email purdueIOnotify@gmail.com")
             email_server.quit()
 
 
@@ -246,7 +267,7 @@ def main():
         deleteCRN(CRN)
 
 
-    print("Beginning search routine. CRNs will be checked every minute for significant changes.")
+    print("Beginning search routine. CRNs will be checked every 5 minutes for significant changes.")
     #Now begin one minute loop and update all CRNs that are being tracked.
     taskLoop(300, updateAllData, term_selected, email)
 
